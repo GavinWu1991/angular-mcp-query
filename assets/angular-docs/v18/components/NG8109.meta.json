@@ -1,0 +1,6 @@
+{
+  "originalPath": "reference/extended-diagnostics/NG8109.md",
+  "category": "api",
+  "filename": "NG8109",
+  "title": "Signals must be invoked in template interpolations."
+}

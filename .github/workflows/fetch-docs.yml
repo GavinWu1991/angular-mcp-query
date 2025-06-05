@@ -1,0 +1,109 @@
+name: Fetch Angular Documentation
+
+on:
+  schedule:
+    # Run daily at 6 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Angular version/branch to fetch'
+        required: false
+        default: 'main'
+      force:
+        description: 'Force fetch even if major version exists'
+        required: false
+        default: 'false'
+
+jobs:
+  fetch-docs:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Configure Git
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        
+    - name: Fetch Angular Documentation
+      run: |
+        if [ "${{ github.event.inputs.force }}" = "true" ]; then
+          node src/tools/doc-fetcher/cli.js fetch --angular-version ${{ github.event.inputs.version || 'main' }} --force
+        else
+          node src/tools/doc-fetcher/cli.js fetch --angular-version ${{ github.event.inputs.version || 'main' }}
+        fi
+      env:
+        NODE_ENV: production
+        
+    - name: List fetched major versions
+      run: node src/tools/doc-fetcher/cli.js list
+      
+    - name: Check for changes
+      id: changes
+      run: |
+        if [ -n "$(git status --porcelain assets/)" ]; then
+          echo "changes=true" >> $GITHUB_OUTPUT
+          echo "Documentation changes detected"
+        else
+          echo "changes=false" >> $GITHUB_OUTPUT
+          echo "No documentation changes"
+        fi
+        
+    - name: Commit and push changes
+      if: steps.changes.outputs.changes == 'true'
+      run: |
+        git add assets/
+        git commit -m "docs: update Angular documentation cache (major version)"
+        git push
+        
+    - name: Create summary
+      run: |
+        echo "## 📚 Angular Documentation Fetch Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Version:** ${{ github.event.inputs.version || 'main' }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Force:** ${{ github.event.inputs.force || 'false' }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Changes:** ${{ steps.changes.outputs.changes }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Cached Major Versions" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        node src/tools/doc-fetcher/cli.js list --silent >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+
+  cleanup:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    needs: fetch-docs
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Clean old major versions (keep last 3)
+      run: |
+        # Keep only the 3 most recent major versions
+        echo "Current major versions:"
+        node src/tools/doc-fetcher/cli.js list
+        
+        # TODO: Implement cleanup logic if needed
+        echo "Cleanup not implemented - manual review recommended for major versions" 
