@@ -1,6 +1,6 @@
 {
   "originalPath": "reference/migrations/route-lazy-loading.md",
-  "category": "api",
+  "category": "components",
   "filename": "route-lazy-loading",
   "title": "Migration to lazy-loaded routes"
 }

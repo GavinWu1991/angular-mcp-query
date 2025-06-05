@@ -1,18 +1,34 @@
-# Migrations
+# Overview of Angular libraries
 
-Learn about how you can migrate your existing angular project to the latest features incrementally.
+Many applications need to solve the same general problems, such as presenting a unified user interface, presenting data, and allowing data entry.
+Developers can create general solutions for particular domains that can be adapted for re-use in different applications.
+Such a solution can be built as Angular *libraries* and these libraries can be published and shared as *npm packages*.
 
-<docs-card-container>
-  <docs-card title="Standalone" link="Migrate now" href="reference/migrations/standalone">
-    Standalone components provide a simplified way to build Angular applications. Standalone components specify their dependencies directly instead of getting them through NgModules.
-  </docs-card>
-  <docs-card title="Control Flow Syntax" link="Migrate now" href="reference/migrations/control-flow">
-    Built-in Control Flow Syntax allows you to use more ergonomic syntax which is close to JavaScript and has better type checking. It replaces the need to import `CommonModule` to use functionality like `*ngFor`, `*ngIf` and `*ngSwitch`.
-  </docs-card>
-  <docs-card title="inject() Function" link="Migrate now" href="reference/migrations/inject-function">
-    Angular's `inject` function offers more accurate types and better compatibility with standard decorators, compared to constructor-based injection.
-  </docs-card>
-  <docs-card title="Lazy-loaded routes" link="Migrate now" href="reference/migrations/route-lazy-loading">
-    Convert eagerly loaded component routes to lazy loaded ones. This allows the build process to split production bundles into smaller chunks, to load less JavaScript at initial page load.
-  </docs-card>
-</docs-card-container>
+An Angular library is an Angular project that differs from an application in that it cannot run on its own.
+A library must be imported and used in an application.
+
+Libraries extend Angular's base features.
+For example, to add [reactive forms](guide/forms/reactive-forms) to an application, add the library package using `ng add @angular/forms`, then import the `ReactiveFormsModule` from the `@angular/forms` library in your application code.
+Similarly, adding the [service worker](ecosystem/service-workers) library to an Angular application is one of the steps for turning an application into a [Progressive Web App](https://developers.google.com/web/progressive-web-apps) \(PWA\).
+[Angular Material](https://material.angular.io) is an example of a large, general-purpose library that provides sophisticated, reusable, and adaptable UI components.
+
+Any application developer can use these and other libraries that have been published as npm packages by the Angular team or by third parties.
+See [Using Published Libraries](tools/libraries/using-libraries).
+
+HELPFUL: Libraries are intended to be used by Angular applications. To add Angular features to non-Angular web applications, use [Angular custom elements](guide/elements).
+
+## Creating libraries
+
+If you have developed features that are suitable for reuse, you can create your own libraries.
+These libraries can be used locally in your workspace, or you can publish them as [npm packages](reference/configs/npm-packages) to share with other projects or other Angular developers.
+These packages can be published to the npm registry, a private npm Enterprise registry, or a private package management system that supports npm packages.
+See [Creating Libraries](tools/libraries/creating-libraries).
+
+Deciding to package features as a library is an architectural decision. It is comparable to deciding whether a feature is a component or a service, or deciding on the scope of a component.
+
+Packaging features as a library forces the artifacts in the library to be decoupled from the application's business logic.
+This can help to avoid various bad practices or architecture mistakes that can make it difficult to decouple and reuse code in the future.
+
+Putting code into a separate library is more complex than simply putting everything in one application.
+It requires more of an investment in time and thought for managing, maintaining, and updating the library.
+This complexity can pay off when the library is being used in multiple applications.

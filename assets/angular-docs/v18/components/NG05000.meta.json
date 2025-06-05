@@ -1,6 +1,6 @@
 {
   "originalPath": "reference/errors/NG05000.md",
-  "category": "api",
+  "category": "components",
   "filename": "NG05000",
   "title": "Hydration with unsupported Zone.js instance"
 }

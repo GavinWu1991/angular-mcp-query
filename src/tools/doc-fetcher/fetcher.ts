@@ -7,7 +7,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import os from 'os';
 import { config } from '../../../config/config.js';
-import { VersionManager } from '../../core/version-manager.js';
+import { VersionManager } from '../../utils/version-manager.js';
 
 export interface FetchResult {
   skipped?: boolean;
@@ -76,6 +76,37 @@ export class AngularDocumentationFetcher {
     this.octokit = new Octokit();
   }
 
+  /**
+   * Automatically fetch all supported Angular versions
+   */
+  async fetchSupportedVersions(options: FetchOptions = {}): Promise<FetchResult[]> {
+    const supportedVersions = await VersionManager.getSupportedVersions();
+    const results: FetchResult[] = [];
+    
+    if (options.verbose) {
+      console.log(chalk.blue(`🔍 Fetching documentation for supported versions: ${supportedVersions.join(', ')}`));
+    }
+
+    for (const version of supportedVersions) {
+      try {
+        // For major versions like "v18", we need to resolve to the latest release
+        const result = await this.fetch(version, options);
+        results.push(result);
+        
+        if (options.verbose) {
+          console.log(chalk.green(`✅ Successfully fetched ${version}`));
+        }
+      } catch (error) {
+        if (options.verbose) {
+          console.log(chalk.red(`❌ Failed to fetch ${version}: ${(error as Error).message}`));
+        }
+        // Continue with other versions even if one fails
+      }
+    }
+
+    return results;
+  }
+
   async fetch(version: string, options: FetchOptions = {}): Promise<FetchResult> {
     const startTime = Date.now();
     
@@ -84,9 +115,22 @@ export class AngularDocumentationFetcher {
         console.log(chalk.blue(`🔍 Starting fetch for Angular version: ${version}`));
       }
 
+      // If this is a major version (v18, v20), get the actual version to fetch
+      let versionToFetch = version;
+      const majorVersion = VersionManager.extractMajorVersion(version);
+      
+      // Check if this is a supported major version and get the actual tag to fetch
+      try {
+        const supportedVersions = await VersionManager.getSupportedVersions();
+        if (supportedVersions.includes(majorVersion)) {
+          versionToFetch = VersionManager.getVersionToFetch(majorVersion);
+        }
+      } catch (error) {
+        // If version manager fails, continue with original version resolution
+      }
+      
       // Resolve version to actual GitHub branch/tag
-      const resolvedVersion = await this.resolveGitHubVersion(version);
-      const majorVersion = VersionManager.extractMajorVersion(resolvedVersion);
+      const resolvedVersion = await this.resolveGitHubVersion(versionToFetch);
       
       if (options.verbose) {
         console.log(chalk.gray(`Resolved to: ${resolvedVersion} (Major: ${majorVersion})`));

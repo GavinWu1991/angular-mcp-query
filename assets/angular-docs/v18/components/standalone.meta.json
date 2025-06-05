@@ -1,6 +1,6 @@
 {
   "originalPath": "reference/migrations/standalone.md",
-  "category": "api",
+  "category": "components",
   "filename": "standalone",
   "title": "Migrate an existing Angular project to standalone"
 }

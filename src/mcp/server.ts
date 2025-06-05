@@ -15,6 +15,7 @@ import {
 import { AngularDocumentationFetcher } from '../tools/doc-fetcher/index.js';
 import { DocumentLoader } from '../core/index.js';
 import { config } from '../../config/config.js';
+import { VersionManager } from '../utils/version-manager.js';
 
 interface SearchDocsArgs {
   term: string;
@@ -43,7 +44,12 @@ interface ListVersionsArgs {
   // No arguments needed
 }
 
-type ToolArgs = SearchDocsArgs | GetComponentArgs | FetchDocsArgs | ListCategoriesArgs | ListVersionsArgs;
+interface FetchAllSupportedVersionsArgs {
+  force?: boolean;
+  verbose?: boolean;
+}
+
+type ToolArgs = SearchDocsArgs | GetComponentArgs | FetchDocsArgs | ListCategoriesArgs | ListVersionsArgs | FetchAllSupportedVersionsArgs;
 
 export class AngularDocsMCPServer {
   private server: Server;
@@ -162,6 +168,25 @@ export class AngularDocsMCPServer {
             required: ['version'],
           },
         },
+        {
+          name: 'fetch_all_supported_versions',
+          description: 'Automatically fetch documentation for all supported Angular versions.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              force: {
+                type: 'boolean',
+                description: 'Force fetch even if versions already exist',
+                default: false,
+              },
+              verbose: {
+                type: 'boolean',
+                description: 'Enable verbose logging',
+                default: false,
+              },
+            },
+          },
+        },
       ];
 
       return { tools };
@@ -223,6 +248,8 @@ export class AngularDocsMCPServer {
           return await this.fetchAngularDocs(args as unknown as FetchDocsArgs);
         case 'list_angular_categories':
           return await this.listAngularCategories(args as unknown as ListCategoriesArgs);
+        case 'fetch_all_supported_versions':
+          return await this.fetchAllSupportedVersions(args as unknown as FetchAllSupportedVersionsArgs);
         default:
           throw new Error(`Unknown tool: ${name}`);
       }
@@ -378,14 +405,62 @@ export class AngularDocsMCPServer {
   }
 
   /**
-   * Get target version - requires explicit version specification
+   * Get target version - validates against supported versions
    */
   private async getTargetVersion(requestedVersion: string): Promise<string> {
     if (!requestedVersion) {
       throw new Error('Angular version is required. Please specify a version (e.g., v18).');
     }
 
-    return await this.documentLoader.resolveMajorVersion(requestedVersion);
+    try {
+      // Validate and normalize the version using VersionManager
+      const normalizedVersion = await VersionManager.validateAndNormalizeVersion(requestedVersion);
+      
+      // Use document loader to resolve to actual version if needed
+      return await this.documentLoader.resolveMajorVersion(normalizedVersion);
+    } catch (error) {
+      // If version is not supported, provide helpful error with supported versions
+      const supportedVersions = await VersionManager.getSupportedVersions();
+      throw new Error(`${(error as Error).message}. Available versions: ${supportedVersions.join(', ')}`);
+    }
+  }
+
+  /**
+   * Fetch all supported Angular versions
+   */
+  private async fetchAllSupportedVersions(args: FetchAllSupportedVersionsArgs): Promise<CallToolResult> {
+    const { force = false, verbose = false } = args;
+
+    try {
+      console.log('🚀 Fetching documentation for all supported Angular versions...');
+      
+      const results = await this.fetcher.fetchSupportedVersions({ force, verbose });
+      
+      const summary = {
+        totalVersions: results.length,
+        successful: results.filter(r => !r.skipped).length,
+        skipped: results.filter(r => r.skipped).length,
+        results: results.map(result => ({
+          majorVersion: result.majorVersion,
+          version: result.version,
+          status: result.skipped ? 'skipped' : 'fetched',
+          processed: result.processed,
+          duration: result.duration,
+          reason: result.reason
+        }))
+      };
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(summary, null, 2),
+          },
+        ],
+      };
+    } catch (error) {
+      throw new Error(`Failed to fetch all supported versions: ${(error as Error).message}`);
+    }
   }
 
   /**

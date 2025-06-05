@@ -1,6 +1,6 @@
 {
   "originalPath": "reference/errors/NG0956.md",
-  "category": "api",
+  "category": "components",
   "filename": "NG0956",
   "title": "Tracking expression caused re-creation of the DOM structure."
 }

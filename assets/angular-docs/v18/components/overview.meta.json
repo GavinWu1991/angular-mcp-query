@@ -1,6 +1,6 @@
 {
-  "originalPath": "reference/migrations/overview.md",
-  "category": "api",
+  "originalPath": "tools/libraries/overview.md",
+  "category": "components",
   "filename": "overview",
-  "title": "Migrations"
+  "title": "Overview of Angular libraries"
 }

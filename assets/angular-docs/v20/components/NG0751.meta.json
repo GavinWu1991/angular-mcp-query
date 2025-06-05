@@ -1,6 +1,6 @@
 {
   "originalPath": "reference/errors/NG0751.md",
-  "category": "api",
+  "category": "components",
   "filename": "NG0751",
   "title": "@defer behavior when HMR is enabled"
 }

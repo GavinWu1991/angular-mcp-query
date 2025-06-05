@@ -285,7 +285,7 @@ class MCPTestClient {
     const server = await this.runServer();
     
     try {
-      // Test fallback behavior with invalid version - should succeed with fallback
+      // Test proper error handling with invalid version - should reject with helpful message
       const response = await this.sendRequest(server, {
         jsonrpc: "2.0",
         id: 6,
@@ -294,26 +294,22 @@ class MCPTestClient {
           name: "search_angular_docs",
           arguments: {
             term: "test",
-            version: "v999", // Invalid version, should fallback
+            version: "v999", // Invalid version, should be rejected
             limit: 1
           }
         }
       });
 
-      if (response.error) {
-        throw new Error(`Unexpected error with fallback: ${response.error.message}`);
+      if (!response.error) {
+        throw new Error('Expected error for unsupported version, but got success');
       }
 
-      // Should get results with fallback version
-      const resultText = response.result.content[0].text;
-      const searchResult = JSON.parse(resultText);
-      
-      // Should have term as test and fallback version behavior
-      if (searchResult.term !== "test") {
-        throw new Error(`Expected term 'test' but got ${searchResult.term}`);
+      // Should get helpful error message mentioning supported versions
+      if (!response.error.message.includes('Supported major versions')) {
+        throw new Error(`Expected helpful error message but got: ${response.error.message}`);
       }
 
-      console.log(`   Correctly handled version fallback for invalid version`);
+      console.log(`   Correctly rejected unsupported version with helpful error message`);
     } finally {
       server.kill();
     }
@@ -497,7 +493,7 @@ class MCPTestClient {
     await this.runTest('Search Angular Documentation', () => this.testSearchAngularDocs());
     await this.runTest('Get Angular Component', () => this.testGetAngularComponent());
     await this.runTest('List Categories', () => this.testListCategories());
-    await this.runTest('Version Fallback and Error Handling', () => this.testErrorHandling());
+    await this.runTest('Version Validation and Error Handling', () => this.testErrorHandling());
     await this.runTest('Path Resolution from Different Directory', () => this.testPathResolutionFromDifferentDirectory());
     await this.runTest('Multiple Angular Versions', () => this.testMultipleVersions());
     await this.runTest('Invalid Tool Name', () => this.testInvalidTool());
