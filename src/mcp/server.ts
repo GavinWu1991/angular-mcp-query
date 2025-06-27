@@ -482,6 +482,10 @@ export class AngularDocsMCPServer {
   async start(): Promise<void> {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.log('Angular Documentation MCP Server started with version management');
+    console.log('Angular Documentation MCP Server started.');
+    console.log(`Using documentation asset path: ${config.storage.assetsPath}`);
+    // Advise on fetching if the directory is empty or doesn't exist?
+    // Could be done by checking `this.documentLoader.listVersions()` or similar.
+    // For now, just logging the path is a good first step.
   }
 } 

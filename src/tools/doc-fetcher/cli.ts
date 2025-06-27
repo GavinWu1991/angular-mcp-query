@@ -26,6 +26,11 @@ program
   .action(async (options: FetchOptions) => {
     try {
       const fetcher = new AngularDocumentationFetcher();
+      // Access config after fetcher instantiation, as fetcher constructor uses it.
+      // This ensures config is initialized before we try to read config.storage.assetsPath.
+      const { config } = await import('../../../config/config.js');
+      console.log(chalk.blue(`ℹ️  Using documentation asset path: ${config.storage.assetsPath}`));
+
       const result = await fetcher.fetch(options.angularVersion, options);
       
       if (result.skipped) {

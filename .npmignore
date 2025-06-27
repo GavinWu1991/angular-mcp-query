@@ -1,0 +1,34 @@
+# Source files
+src/
+config/config.ts
+
+# TypeScript artifacts
+tsconfig.json
+*.tsbuildinfo
+
+# Tests
+test/
+
+# GitHub specific
+.github/
+
+# Git specific
+.gitignore
+
+# Development/local files
+scripts/
+demo.md
+PROJECT_STRUCTURE.md
+README.zh-CN.md
+mcp-config.json
+# Assets - assuming docs are fetched by user post-install
+# This means the application must handle creating this directory
+# and guide users to fetch documentation.
+assets/
+
+# Lockfile (common to exclude for libraries, npm creates one for users)
+package-lock.json
+
+# Build output (if it's ever committed by mistake)
+dist/
+```
