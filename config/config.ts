@@ -1,5 +1,32 @@
 import path from 'path';
+import os from 'os';
+import fs from 'fs-extra'; // Used for ensureDirSync, if needed for config bootstrapping
 import { fileURLToPath } from 'url';
+
+// Helper function to determine user-specific data directory
+const getDefaultAssetsPath = (): string => {
+  const appName = 'angular-mcp-query';
+  let baseDir: string;
+
+  switch (os.platform()) {
+    case 'win32': // Windows
+      baseDir = process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local');
+      break;
+    case 'darwin': // macOS
+      baseDir = path.join(os.homedir(), 'Library', 'Application Support');
+      break;
+    default: // Linux and other POSIX
+      baseDir = process.env.XDG_DATA_HOME || path.join(os.homedir(), '.local', 'share');
+      break;
+  }
+  const assetsPath = path.join(baseDir, appName, 'assets', 'angular-docs');
+  // fs.ensureDirSync(assetsPath); // Ensure directory exists when config is loaded
+  // Decided against ensureDirSync here to avoid side-effects on import.
+  // The application logic (e.g., DocumentLoader or Fetcher) should call ensureDir.
+  return assetsPath;
+};
+
+const userDefinedAssetsPath = process.env.ANGULAR_MCP_ASSETS_PATH;
 
 interface CategoryConfig {
   patterns: string[];
@@ -49,7 +76,7 @@ export const config: AppConfig = {
   
   // Local storage configuration
   storage: {
-    assetsPath: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../assets/angular-docs'),
+    assetsPath: userDefinedAssetsPath || getDefaultAssetsPath(),
     cacheValidityHours: 24, // Cache validity in hours
   },
   

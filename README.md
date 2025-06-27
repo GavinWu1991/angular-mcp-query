@@ -33,34 +33,60 @@
 
 ## 🚀 快速开始 | Quick Start
 
-### 安装 | Installation
+### 1. 安装 | Installation
 
+**推荐：全局安装 (for CLI usage and MCP Server)**
 ```bash
-# 克隆项目 | Clone repository
-git clone https://github.com/your-username/angular-mcp-query.git
-cd angular-mcp-query
-
-# 安装依赖 | Install dependencies
-npm install
-
-# 获取文档 | Fetch documentation
-npm run fetch
-
-# 启动服务 | Start MCP server
-npm start
+npm install -g angular-mcp-query
 ```
 
-### 基本用法 | Basic Usage
+**或者：本地安装到项目 (for programmatic usage)**
+```bash
+npm install angular-mcp-query
+```
+
+### 2. 获取文档 | Fetching Documentation
+
+第一次使用时，你需要下载 Angular 文档。选择一个你需要的 Angular 版本 (例如: v18, main)。
 
 ```bash
-# 检测项目版本 | Detect project version
-npm run docs:detect
+# 示例：获取最新的 v18 文档 (如果 v18 是最新的稳定版)
+angular-mcp-query docs fetch --angular-version v18
 
-# 列出缓存版本 | List cached versions  
-npm run docs:list
+# 获取主分支的最新文档 (开发版)
+angular-mcp-query docs fetch --angular-version main --verbose
+```
+文档会被存储在一个用户特定的目录中 (详见下面的配置部分)。
 
-# 搜索文档 | Search documentation
-# (通过 MCP 客户端 | via MCP client)
+### 3. 启动 MCP 服务 | Start MCP Server
+
+```bash
+angular-mcp-query
+```
+服务器启动后，你可以将其配置到兼容的 MCP 客户端中。
+
+### 4. 其他文档管理命令 | Other Document Management Commands
+
+```bash
+# 列出已缓存的文档版本
+angular-mcp-query docs list
+
+# 移除特定版本的文档缓存
+angular-mcp-query docs remove v17
+# (请替换 v17 为你想要移除的版本)
+```
+
+### 基本用法 (作为库) | Basic Usage (as a library)
+```javascript
+import { AngularDocsMCPServer } from 'angular-mcp-query';
+
+async function startMyServer() {
+  // 你可以在这里传递配置参数给构造函数 (如果支持)
+  const server = new AngularDocsMCPServer();
+  await server.start();
+}
+
+startMyServer().catch(console.error);
 ```
 
 ---
@@ -129,34 +155,64 @@ src/
 ### MCP 客户端配置 | MCP Client Configuration
 
 **Claude Desktop**:
+
+如果 `angular-mcp-query` 已全局安装并处于你的系统 PATH中:
 ```json
 {
   "mcpServers": {
     "angular-docs": {
-      "command": "node",
-      "args": ["src/index.js"],
-      "cwd": "/path/to/angular-mcp-query"
+      "command": "angular-mcp-query"
     }
   }
 }
 ```
+如果安装在项目本地，你可能需要指定到 `node_modules/.bin/angular-mcp-query` 的路径，或者使用 `npx angular-mcp-query`。
 
-### 项目配置 | Project Configuration
-**配置文件 | Config file**: `config/config.js`
-- 文档存储路径 | Documentation storage path
-- 版本管理策略 | Version management strategy
-- 搜索行为配置 | Search behavior settings
-- 缓存策略设置 | Cache strategy configuration
+### 文档存储与配置 | Documentation Storage & Configuration
+
+- **默认存储路径 | Default Storage Path**: `angular-mcp-query` 会将下载的文档存储在一个用户特定的目录中。这避免了权限问题，并保持你的项目目录清洁。
+    - **Linux**: 通常在 `~/.local/share/angular-mcp-query/assets/angular-docs`
+    - **macOS**: 通常在 `~/Library/Application Support/angular-mcp-query/assets/angular-docs`
+    - **Windows**: 通常在 `%LOCALAPPDATA%\\angular-mcp-query\\assets\\angular-docs`
+- **自定义存储路径 | Custom Storage Path**: 你可以通过设置 `ANGULAR_MCP_ASSETS_PATH` 环境变量来覆盖默认的存储路径。
+    ```bash
+    export ANGULAR_MCP_ASSETS_PATH="/custom/path/to/angular-docs-cache"
+    angular-mcp-query docs fetch
+    # or
+    ANGULAR_MCP_ASSETS_PATH="/custom/path/to/angular-docs-cache" angular-mcp-query
+    ```
+- **内部配置 | Internal Configuration**: 核心配置文件是 `dist/config/config.js` (由 `config/config.ts` 编译而来)。一般情况下，你不需要直接修改它，应优先使用环境变量进行配置。
 
 ---
 
-## 🛠️ 开发 | Development
+## 🛠️ 开发 (从源码) | Development (from source)
 
-### 本地开发 | Local Development
+如果你想为此项目贡献或从源码运行：
+
+### 安装依赖 | Install Dependencies
 ```bash
-npm run dev        # 开发模式 | Development mode
-npm run test       # 运行测试 | Run tests
-npm run fetch      # 获取文档 | Fetch documentation
+git clone https://github.com/GavinWu1991/angular-mcp-query.git
+cd angular-mcp-query
+npm install
+```
+
+### 本地开发命令 | Local Development Commands
+```bash
+# 使用 tsx 实时编译运行开发服务器
+npm run dev
+
+# 构建项目
+npm run build
+
+# 运行构建后的项目
+npm start
+
+# 直接运行 src/index.ts (CLI 入口) 执行特定命令
+# (例如, 等同于全局安装后的 angular-mcp-query docs fetch --angular-version main)
+npx tsx src/index.ts docs fetch --angular-version main
+
+# 运行测试
+npm run test
 ```
 
 ### 贡献 | Contributing
@@ -170,6 +226,7 @@ npm run fetch      # 获取文档 | Fetch documentation
 
 ---
 
+<!-- 性能指标部分可以保留，但可能需要用户在实际使用后更新 -->
 ## 📊 性能指标 | Performance Metrics
 
 | 操作 Operation | 首次 First Time | 增量 Incremental |

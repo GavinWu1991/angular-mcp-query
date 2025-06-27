@@ -2,9 +2,19 @@
   "name": "angular-mcp-query",
   "version": "0.1.0",
   "description": "🚀 Intelligent Angular documentation MCP server with auto version detection & smart caching | 智能 Angular 文档 MCP 服务，支持自动版本检测和智能缓存，消除 AI 代码生成幻觉",
-  "main": "dist/index.js",
+  "main": "dist/src/index.js",
   "type": "module",
+  "bin": {
+    "angular-mcp-query": "dist/src/index.js"
+  },
+  "files": [
+    "dist/src/",
+    "dist/config/",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
+    "prepare": "npm run build",
     "build": "tsc",
     "build:watch": "tsc --watch",
     "start": "node dist/src/index.js",
@@ -33,8 +43,12 @@
     "code-generation",
     "模型上下文协议"
   ],
-  "author": "",
+  "author": "Gavin.Wu",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GavinWu1991/angular-mcp-query.git"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.6.0",
     "chalk": "^5.3.0",
