@@ -1,0 +1,6 @@
+{
+  "originalPath": "guide/templates/ng-content.md",
+  "category": "cli",
+  "filename": "ng-content",
+  "title": "Render templates from a parent component with `ng-content`"
+}

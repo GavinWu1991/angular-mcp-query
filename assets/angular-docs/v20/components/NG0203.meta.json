@@ -1,0 +1,6 @@
+{
+  "originalPath": "reference/errors/NG0203.md",
+  "category": "components",
+  "filename": "NG0203",
+  "title": "`inject()` must be called from an injection context"
+}

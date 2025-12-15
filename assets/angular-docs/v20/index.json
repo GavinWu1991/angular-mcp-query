@@ -1,0 +1,20 @@
+{
+  "majorVersion": "v20",
+  "version": "20.0.1",
+  "generatedAt": "2025-06-05T08:01:39.832Z",
+  "stats": {
+    "totalFiles": 283,
+    "categorized": {
+      "components": 219,
+      "cli": 62
+    },
+    "uncategorized": 2,
+    "processed": 283,
+    "errors": 0
+  },
+  "categories": [
+    "components",
+    "cli",
+    "uncategorized"
+  ]
+}

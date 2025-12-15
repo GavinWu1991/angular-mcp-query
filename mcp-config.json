@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "angular-docs": {
+      "command": "node",
+      "args": ["src/index.js"],
+      "cwd": ".",
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  }
+} 

@@ -1,0 +1,56 @@
+{
+  "name": "angular-mcp-query",
+  "version": "0.1.0",
+  "description": "🚀 Intelligent Angular documentation MCP server with auto version detection & smart caching | 智能 Angular 文档 MCP 服务，支持自动版本检测和智能缓存，消除 AI 代码生成幻觉",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "start": "node dist/src/index.js",
+    "dev": "tsx --watch src/index.ts",
+    "dev:old": "ts-node --esm src/index.ts",
+    "fetch": "tsx src/tools/doc-fetcher/cli.ts fetch",
+    "fetch:force": "tsx src/tools/doc-fetcher/cli.ts fetch --force",
+    "docs:list": "tsx src/tools/doc-fetcher/cli.ts list",
+    "docs:clear": "tsx src/tools/doc-fetcher/cli.ts remove",
+    "docs:detect": "tsx scripts/detect-version.ts",
+    "sync": "tsx src/sync.ts sync",
+    "test": "node test/integration.test.js",
+    "test:integration": "node test/integration.test.js",
+    "test:ci": "./test/ci.test.sh",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "mcp",
+    "angular",
+    "documentation",
+    "ai-assistant",
+    "version-detection",
+    "smart-caching",
+    "cli-tools",
+    "developer-tools",
+    "code-generation",
+    "模型上下文协议"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.6.0",
+    "chalk": "^5.3.0",
+    "commander": "^12.0.0",
+    "fs-extra": "^11.2.0",
+    "gray-matter": "^4.0.3",
+    "marked": "^12.0.0",
+    "octokit": "^4.0.2",
+    "semver": "^7.6.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^20.11.0",
+    "@types/semver": "^7.7.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}

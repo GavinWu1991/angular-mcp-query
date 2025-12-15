@@ -1,0 +1,6 @@
+{
+  "originalPath": "reference/extended-diagnostics/NG8108.md",
+  "category": "components",
+  "filename": "NG8108",
+  "title": "`ngSkipHydration` should be a static attribute"
+}

@@ -1,0 +1,6 @@
+{
+  "originalPath": "reference/errors/NG0403.md",
+  "category": "components",
+  "filename": "NG0403",
+  "title": "Bootstrapped NgModule doesn't specify which component to initialize"
+}
